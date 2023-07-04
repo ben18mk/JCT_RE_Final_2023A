@@ -18,27 +18,27 @@ Note: The reversed code could be refactored. But the task was to write the code 
 </ul>
 
 ## 1
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/62e491e5-dee6-4f92-9d68-f2a58c0094f9)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/cdb036bb-66e2-4da4-a572-0f2fa345e1af)
 
 By opening the executable in CFF Explorer, it is noticeable that the executable has TLS.</br>
 Therefore, I suspect the message I am getting is originated from the TLS.</br>
 Let’s open IDA to statically analyze the executable and have a closer look at the TLS callback.
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/08bf444f-09e1-49b2-8750-04fbe743207a)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/b2bdc7f9-e2d3-4617-bdb5-db2feb1bcb25)
 
 It is noticeable that the TLS callback checks if the file *C:\temp\test.txt exists*.</br>
 If it does, the program will not print the error message and halt like it did, but it will print the initial success message and start running the main function.</br>
 
 Therefore, in order to pass this check, I simply created a file named test.txt under *C:\temp*
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a0e2e565-1d7f-4c76-b274-22fab60c76f7)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/16f570b9-b844-4834-b3e9-1f4f7ab36f70)
 
 Note: The loading of the string *“abcd…0123…”* to the memory as shown in the TLS callback is a prep for the main function.
 
 ## 2
 By dynamically analyzing the main function of the program, first I understand that the length of the username must be bigger or equal 6.
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/ec2abb61-238a-4a43-94c8-f986db753391)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/3b1da0fd-1340-45fa-bfc7-627306d1193b)
 
 Second, the password is constructed based on the username and the “abcd…0123…” that we saw in the TLS.
 
@@ -47,18 +47,18 @@ The program loops over the username and calculates the modulo of the division of
 Therefore, the password will be constructed in a way, that in each iteration, the loop will add to it a new char from the *“abcd…0123…”* string based on the calculated index (*username[i]* % 36).</br>
 This is the body of the loop that performs this action:
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/cb8de9f8-8ccf-49aa-9311-06197d37f175)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/b6aa720a-e57e-424a-8f52-6f9631f945d5)
 
 So, let’s give it a try.</br>
 I will use the username “Benjamin Mamistvalov”</br>
 This is the password that will be generated as explained above:
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/8fec6d9f-d79a-4a3d-8c3e-c2e247a15cdc)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/af952400-a12f-411a-afb0-c2bcac20cf81)
 
 Username = *Benjamin Mamistvalov*</br>
 Password = **4xzxmnkmincdahpzoor1**
 
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/7cef0d86-3ff6-44d2-aaaa-1f47923905b4)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/6c37c19a-955d-49ab-9d5c-179a247c8033)
 
 ## 3
 In this part I will start by coding the main and after the main is done I will code the functions.</br>
@@ -66,102 +66,101 @@ By statically analyzing the program, I understand that the main works as follows
 ### Main
 1.	Assigns destIdx with the value 0 and then calls the function *inputUsername()* to allow the user to input his username.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/4ba32811-5a34-4293-9fbb-1217c5feb68c)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/610b1ca8-4ded-4c5d-aabc-3f156ccd6b2a)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/3107aa11-28ff-48f2-b677-7e1091138ce2)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/356c7ac6-e798-44e8-9654-02e70db01d17)
 
 2.	If the length of the username is less than 6, the program exits.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/d8c54c63-9886-4afc-b448-e820e0654cb4)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/1b2ffcf6-6b68-4478-a312-09c9d4636b13)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e0c24516-33b7-4915-9bb7-1ecae9a077de)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/231b3fdd-0037-46a9-85c4-7cde33ae7531)
 
 3.	Else, it loops over the username and generates the password as shown above in [Section #2](#2)</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/112c7484-0502-41b1-bed1-62fb57c3d55c)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/b2160de7-ceb1-429d-bd3d-69dedc2a977e)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/077c3eeb-5fa7-4db6-81e4-f2bf8d7219b3)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/2fa14421-489c-4a9e-ac16-dd6e127aaecb)
 
 4.	After the loop, the program assigns the length of the username into a new variable named *bufferLength*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/6774b779-cca7-4799-b43d-acd80e616d32)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/41c4ee2a-5b17-4220-8190-01452e0c48d9)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/23fac9eb-abe1-4cbc-b71a-68e1659dfe9d)
-
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/01f974dc-9d3b-4071-8dd5-7b25edbaad6a)
 
 5.	Compiler-added check, therefore I will not add it to the code.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/c0c526d2-2510-43df-8a04-38beee0ce6f1)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/8cb4fd82-2153-4768-9d41-893590ec226e)
 
 6.	Add null char to the generated password.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/ca10075a-e483-4f7d-b993-9b8a161d37f3)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/8c24883d-5705-41bd-9bee-4b39ca6ee11f)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/3470c6ba-414f-4afb-bf2e-acee2706392a)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/60f9b05d-66ad-411f-b96a-af56d7d1bc33)
 
 7.	Calls the function *inputPassword()* to allow the user to input his password.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/7a245296-7e31-4476-a49d-eed39a964c27)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/8ba37213-ad6c-4bd7-981d-3408e4645c57)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/0be2417c-ff61-495e-bfc6-2f1c15aa9206)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/d3465e8a-1ede-4937-94f5-049ace8a0536)
 
 8.	Calls the function *checkPassword()* in order to check if the user’s password matches the generated password by the program. This function will print a message accordingly.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/f1f1f731-a53d-483e-bc4d-4cbbe883e1a3)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/36e2fa1b-9602-4b5c-92be-c6c9fcd3958e)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a52a80d5-d77f-426d-b028-6bb6b2794434)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e0b10520-9f8f-4827-94fb-7ddb922f3435)
 
 ### inputUsername()
 No parameters.</br>
 1.	Prints the string *“Enter username\n”*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/7a50669d-804c-45a9-b1dd-8500655d21e0)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/df286855-9aaf-4734-83b9-e451720d25e2)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/36448c39-4d34-4cb7-883b-7cac5c36095d)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/c33a0b18-7f04-4817-bb9c-31fc572864b5)
 
 2.	Inputs the username to *Username*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a18cca49-fd75-45dd-b38e-2e6b59ba5138)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/cf7c26cf-8f0d-4605-a931-d02b3e8fbfda)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/6666a200-c459-477e-bc97-5a833456c261)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e0a20023-33f4-4d07-b8d0-de1a9254d4d3)
 
 3.	Gets the length of the username without *‘\n’*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e95a5af1-e0c8-4260-95a8-a9bf3952ddaa)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e8d76340-0356-4c07-bc65-70a38c9c9a97)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/f1dfbfa6-32b8-4073-af3e-041db5e97e44)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/de236ded-6fbb-47e8-99b8-ec81096a5720)
 
 4.	Replaces *‘\n’* with null char.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/16cb3c89-5364-4546-8914-23c84bc81af3)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/b2d9d6c0-8f53-4aba-8379-1df921066c84)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/26ef2db1-c506-4dd4-99d6-a3a7d4afb733)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/66e31ac1-e237-44dd-ac7d-a769b1acc1d4)
 
 ### inputPassword()
 No parameters.
 1.	Prints the string *“Enter password\n”*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/ff3bd1af-29c5-4790-96f0-921d47282f07)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a9c55105-a5b5-44dd-af5c-1775cc924125)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/bd8374e4-8257-468f-bb26-1f309e6e8be5)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/34de415b-322e-4854-902d-cc4d0b43d4e3)
 
 2.	Inputs the password to *UserPassword*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/7030c4da-58e2-464d-9447-dc18d243e8ff)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/6a62ed32-6458-4354-ac8e-335290321475)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/ab3566d5-b8e0-4dbc-b14c-992025d04533)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/6eeb4f84-b768-4b91-be9f-3cbc58f7da0c)
 
 3.	Gets the length of the password without *‘\n’*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/dd2175f4-b036-46e9-855d-429a00927baf)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/c97c0406-cb9b-474e-a213-46f45b826d47)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/369a5d22-2f2f-4710-9f92-8f95008b78fc)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/26e2436b-6ab6-435f-80e3-51d8e347be06)
 
 4.	Replaces *‘\n’* with null char.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/306927d7-a292-4fb0-b40f-eb6e51c4afda)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/63b2c0cc-babe-44cf-b931-607da193357d)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a8d106be-56ff-4183-b8c8-cdf6ce20fdb4)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/da33b5f4-e450-48d3-bd21-fb577b755254)
 
 ### checkPassword()
 #### 2 parameters
@@ -174,9 +173,10 @@ No parameters.
 2.	If they are not equal, the program prints *“Wrong\n”*.
 3.	Else, the program prints *“Ace!\n”*.</br>
 **asm:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a693ef95-d353-4123-89d6-05306d4dfffc)</br>
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/a726f863-c5be-49bd-a408-a4973d28403d)</br>
 **C:**</br>
-![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/f8cc9a26-f806-4899-aa01-cbcaf7dc0d47)
+![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/d29d7866-a16e-4ca0-9b16-0df639715d0d)
+
 
 #### Notes
 1.	I defined *BUFFER_SIZE* to be 100
