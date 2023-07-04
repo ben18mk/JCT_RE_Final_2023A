@@ -1,6 +1,8 @@
 # JCT Reverse Engineering Final Exam 2023A Solution
 JCT Exam Solution
 
+Note: The reversed code could be refactored. But the task was to write the code like the original program was coded.
+
 # Write-Up
 ## Objective
 1. Find what is missing which causes the error message and fix it.
