@@ -74,7 +74,7 @@ By statically analyzing the program, I understand that the main works as follows
 **C:**</br>
 ![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/e0c24516-33b7-4915-9bb7-1ecae9a077de)
 
-3.	Else, it loops over the username and generates the password as shown above in [Section #2](https://github.com/ben18mk/JCT_RE_Final_2023A/edit/main/README.md#2)</br>
+3.	Else, it loops over the username and generates the password as shown above in [Section #2](#2)</br>
 **asm:**</br>
 ![image](https://github.com/ben18mk/JCT_RE_Final_2023A/assets/56043333/112c7484-0502-41b1-bed1-62fb57c3d55c)</br>
 **C:**</br>
