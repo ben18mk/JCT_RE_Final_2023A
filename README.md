@@ -1,5 +1,5 @@
 # JCT Reverse Engineering Final Exam 2023A Solution
-JCT Exam Solution
+JCT Exam Solution (Exam Score: 100)
 
 Note: The reversed code could be refactored. But the task was to write the code like the original program was coded.
 
